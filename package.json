@@ -7,9 +7,9 @@
     "start": "electron .",
     "dev": "electron . --dev",
     "build": "electron-builder",
-    "build-mac": "electron-builder --mac",
-    "build-win": "electron-builder --win",
-    "build-linux": "electron-builder --linux"
+    "build-mac": "rm -rf ./dist && electron-builder --mac",
+    "build-win": "rm -rf ./dist && electron-builder --win",
+    "build-linux": "rm -rf ./dist && electron-builder --linux"
   },
   "author": "你的名字",
   "license": "MIT",
@@ -31,7 +31,8 @@
       "preload.js",
       "renderer.js",
       "index.html",
-      "package.json"
+      "package.json",
+      "node_modules/**/*"
     ],
     "extraResources": [
       {
