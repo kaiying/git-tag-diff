@@ -60,7 +60,7 @@ temp/
 config.json
 
 # Package manager
-package-lock.json
+# package-lock.json  # 應該要 commit 以確保依賴版本一致
 yarn.lock
 
 # Optional npm cache directory
