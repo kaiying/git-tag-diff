@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Tags Commit 差異比較</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.6em;
+            margin-bottom: 0;
+            font-weight: 500;
+        }
+
+        .main-content {
+            padding: 40px 30px;
+        }
+
+        .section {
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        .input-group .form-input {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .buttons-section {
+            margin-top: 30px;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .button-row:last-child {
+            margin-bottom: 0;
+            justify-content: center;
+        }
+
+        .button-row .btn {
+            flex: 1;
+        }
+
+        .button-row:last-child .btn {
+            flex: none;
+            width: 100%;
+        }
+
+        .btn-secondary-large {
+            background: #6c757d;
+            color: white;
+            width: 100%;
+            padding: 15px;
+            font-size: 14px;
+            font-weight: 500;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-secondary-large:hover {
+            background: #545b62;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-secondary-large:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            width: 100%;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .number-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .tags-input-container {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            background: #f8f9fa;
+        }
+
+        .tags-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .tag-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tag-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .btn-small {
+            padding: 6px 10px;
+            font-size: 12px;
+            min-width: 60px;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .status-message {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .status-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .status-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+            }
+
+            .number-inputs {
+                grid-template-columns: 1fr;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏷️ Git Tags Commit 差異比較</h1>
+        </div>
+
+        <div class="main-content">
+            <div class="section">
+                <h2 class="section-title">📁 專案設定</h2>
+                <div class="form-group">
+                    <label class="form-label">Git 專案路徑</label>
+                    <div class="input-group">
+                        <input type="text" id="projectPath" class="form-input" placeholder="選擇包含 .git 的專案目錄">
+                        <button id="selectPathBtn" class="btn btn-secondary">瀏覽</button>
+                    </div>
+                    <div class="help-text">請選擇包含 .git 目錄的 Git 專案根目錄</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">⚙️ 顯示設定</h2>
+                <div class="number-inputs">
+                    <div class="form-group">
+                        <label class="form-label">標籤數</label>
+                        <input type="number" id="tagsPerGroup" class="form-input" min="1" max="50" value="8">
+                        <div class="help-text">每個分組顯示多少個標籤</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Commit 數量 <span style="color: #999; font-size: 12px;">(不建議修改)</span></label>
+                        <input type="number" id="commitsPerTag" class="form-input" min="0" max="100" value="0">
+                        <div class="help-text">0=顯示版本間差異，其他數字=顯示最新N個提交</div>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label class="form-label">Commit 上限筆數</label>
+                    <input type="number" id="commitLimit" class="form-input" min="1" max="200" value="50">
+                    <div class="help-text">版本間差異模式的最大顯示 Commit 數量</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🏷️ 標籤分組前綴</h2>
+                <div class="tags-input-container">
+                    <div id="tagGroupsContainer">
+                        <!-- 動態生成的標籤輸入框 -->
+                    </div>
+                    <button id="addTagGroupBtn" class="btn btn-success btn-small">+ 新增分組</button>
+                </div>
+                <div class="help-text">定義標籤前綴來分組顯示，例如：prd-v、uat-v、stg-v 等</div>
+            </div>
+
+            <div class="buttons-section">
+                <div class="button-row">
+                    <button id="refreshTagsBtn" class="btn btn-secondary-large">
+                        🔄 更新標籤
+                    </button>
+                    <button id="generateBtn" class="btn btn-secondary-large">
+                        📊 產生檔案
+                    </button>
+                </div>
+                <div class="button-row">
+                    <button id="refreshAndGenerateBtn" class="btn btn-primary">
+                        🚀 更新標籤並產生
+                    </button>
+                </div>
+            </div>
+
+            <div id="statusMessage" class="hidden"></div>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
