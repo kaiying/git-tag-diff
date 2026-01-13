@@ -324,6 +324,7 @@ class GitTagsViewerApp {
     }
 
     escapeJsonString(input) {
+        if (!input) return '';
         return input
             .replace(/\\/g, '\\\\')
             .replace(/"/g, '\\"')
@@ -794,7 +795,14 @@ class GitTagsViewerApp {
 
                 tagItems.forEach(item => {
                     const tagName = item.dataset.tagName || '';
-                    const commits = JSON.parse(item.dataset.commits || '[]');
+                    let commits = [];
+
+                    try {
+                        commits = JSON.parse(item.dataset.commits || '[]');
+                    } catch (e) {
+                        console.warn('Failed to parse commits data for tag:', tagName);
+                        commits = [];
+                    }
 
                     const tagMatches = tagName.toLowerCase().includes(lowerSearchTerm);
                     const commitMatches = commits.some(msg =>
